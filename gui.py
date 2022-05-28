@@ -28,7 +28,11 @@ class App(tk.Tk):
         rightframe = tk.Frame(self)
         rightframe.pack(side='right', fill='both', expand=True)
 
-        # for choosing gates
+        # for player 1
+        topframe = tk.Frame(self)
+        topframe.pack(side=tk.TOP, fill='both', expand=True)
+
+        # for player 2 
         bottomframe = tk.Frame(self)
         bottomframe.pack(side=tk.BOTTOM, fill='both', expand=True)
 
@@ -49,6 +53,9 @@ class App(tk.Tk):
 
         for i in range(num_wires):
             tk.Radiobutton(rightframe, text=str(i), variable=None, value=i).pack(side=tk.TOP, fill=tk.X, expand=1)
+
+        for i in range(10):
+            tk.Button(topframe, text="X").pack(side=tk.LEFT, fill=tk.X, expand=1)
 
         for i in range(10):
             tk.Button(bottomframe, text="H").pack(side=tk.LEFT, fill=tk.X, expand=1)
