@@ -257,6 +257,9 @@ class App(tk.Tk):
             self.qc.x(wires[0])
         elif gate == 'CX': 
             self.qc.cnot(wires[0], wires[1])
+
+        self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(gate)
+        
         self.active_player = (self.active_player+1)%2
         
         self.hide_p1_choice()
@@ -277,7 +280,7 @@ class App(tk.Tk):
         self.draw(5, self.p1_deck, self.p1_hand)
         self.draw(5, self.p2_deck, self.p2_hand)
         cr = qiskit.ClassicalRegister(6)
-        self.qc.measure(range(6), cr)
+        self.qc.measure(range(6))
         measure = 0
         for i in self.cr:
             measure =+ i
