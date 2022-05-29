@@ -49,7 +49,7 @@ class App(tk.Tk):
         self.target_frame = tk.Frame(self)
         self.target_frame.grid(row=1, column=3, sticky="nsew")
 
-        self.control2_lbl = tk.Label(self.control2_frame, text="Control\nqubit")
+        self.control2_lbl = tk.Label(self.control2_frame, text="^\nControl\nqubit")
         self.control2_wire = tk.IntVar()
         self.radio_control2 = [
             tk.Radiobutton(
@@ -62,7 +62,7 @@ class App(tk.Tk):
             for i in range(NUM_WIRES)
         ]
 
-        self.control1_lbl = tk.Label(self.control1_frame, text="Control\nqubit")
+        self.control1_lbl = tk.Label(self.control1_frame, text="^\nControl\nqubit")
         self.control1_wire = tk.IntVar()
         self.radio_control1 = [
             tk.Radiobutton(
@@ -77,7 +77,7 @@ class App(tk.Tk):
             for i in range(NUM_WIRES)
         ]
 
-        self.target_lbl = tk.Label(self.target_frame, text="Target\nqubit")
+        self.target_lbl = tk.Label(self.target_frame, text="^\nTarget\nqubit")
         self.target_wire = tk.IntVar()
         self.radio_target = [
             tk.Radiobutton(
@@ -93,8 +93,6 @@ class App(tk.Tk):
         self.rightframe = tk.Frame(self)
         self.rightframe.grid(row=1, column=4, sticky="nsew")
 
-        all_gates = ["H", "X", "CX"]
-
         self.qc = qiskit.QuantumCircuit(NUM_WIRES, NUM_WIRES)
         self.initial_circuit()
         self.replot()
@@ -104,21 +102,30 @@ class App(tk.Tk):
         self.p1_points = 0
         self.p2_points = 0
 
-        self.p1_deck = [*(["H"] * 12), *(["X"] * 12), *(["CX"] * 6)]
+        self.p1_deck = [
+            *(["H"] * 12),
+            *(["X"] * 12),
+            *(["Y"] * 6),
+            *(["Z"] * 6),
+            *(["S"] * 6),
+            *(["T"] * 6),
+            *(["CX"] * 8),
+            *(["CCX"] * 2),
+        ]
         self.p2_deck = self.p1_deck.copy()
 
         self.p1_hand = []
-        self.draw(2, self.p1_deck, self.p1_hand)
+        self.draw(6, self.p1_deck, self.p1_hand)
         self.p2_hand = []
-        self.draw(2, self.p2_deck, self.p2_hand)
+        self.draw(6, self.p2_deck, self.p2_hand)
 
         self.p1_pass = False
         self.p2_pass = False
 
-        p1_hand = random.choices(all_gates, k=10)
-        p1_hand.sort()
-        p2_hand = random.choices(all_gates, k=10)
-        p2_hand.sort()
+        # p1_hand = random.choices(all_gates, k=10)
+        # p1_hand.sort()
+        # p2_hand = random.choices(all_gates, k=10)
+        # p2_hand.sort()
 
         self.apply_button = tk.Button(
             self.rightframe,
@@ -137,13 +144,13 @@ class App(tk.Tk):
 
         self.lbl_p1 = tk.Label(self.topframe, text="Player 1's hand: ")
         self.pass_button1 = tk.Button(
-            self.rightframe, text="Pass", command=lambda: self.pass_round()
-        ).pack()
+            self.topframe, text="Pass", command=lambda: self.pass_round()
+        )
 
-        self.lbl_p1 = tk.Label(self.topframe, text="Player 1's hand: ")
+        self.lbl_p2 = tk.Label(self.bottomframe, text="Player 2's hand: ")
         self.pass_button2 = tk.Button(
-            self.rightframe, text="Pass", command=lambda: self.pass_round()
-        ).pack()
+            self.bottomframe, text="Pass", command=lambda: self.pass_round()
+        )
 
         self.p1_choice = tk.IntVar()
         self.p2_choice = tk.IntVar()
@@ -155,6 +162,11 @@ class App(tk.Tk):
         # self.show_p2_choice()
 
         tk.Button(self.rightframe, text="Quit", command=self.quit).pack()
+        self.lbl_score = tk.Label(
+            self.rightframe,
+            text=f"Score\n Player1: {self.p1_points}\n Player2: {self.p2_points}\n Round no {self.round_no}",
+        )
+        self.lbl_score.pack()
 
     # end __init__
 
@@ -198,36 +210,36 @@ class App(tk.Tk):
         self.apply_button.pack()
 
     def show_radio_control2(self):
-        self.control2_lbl.pack(side=tk.TOP, fill=tk.X)
         for wire in self.radio_control2:
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
+        self.control2_lbl.pack(side=tk.TOP, fill=tk.X)
 
     def show_radio_control1(self, disable=[]):
         if self.target_wire.get() in disable:
             self.apply_button.pack_forget()
 
-        self.control1_lbl.pack(side=tk.TOP, fill=tk.X)
         for i, wire in enumerate(self.radio_control1):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
             wire.configure(state=tk.NORMAL)
             if i in disable:
                 wire.configure(state=tk.DISABLED)
+        self.control1_lbl.pack(side=tk.TOP, fill=tk.X)
 
     def show_radio_target(self, disable=[]):
         if self.target_wire.get() in disable:
             self.apply_button.pack_forget()
 
-        self.target_lbl.pack(side=tk.TOP, fill=tk.X)
         for i, wire in enumerate(self.radio_target):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
             wire.configure(state=tk.NORMAL)
             if i in disable:
                 wire.configure(state=tk.DISABLED)
+        self.target_lbl.pack(side=tk.TOP, fill=tk.X)
 
     def show_wire_choices(self, gate):
         self.hide_wire_choices()
 
-        if gate in ["H", "X"]:
+        if gate in ["H", "X", "Y", "Z", "S", "T"]:
             self.show_radio_target()
         elif gate in ["CX"]:
             self.show_radio_control1()
@@ -262,8 +274,10 @@ class App(tk.Tk):
             # tk.Radiobutton(self.topframe, text=gate, variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[self.p1_choice.get()])).pack(side=tk.LEFT, fill=tk.X, expand=1)
             for i, gate in enumerate(self.p1_hand)
         ]
+        self.lbl_p1.pack(side=tk.LEFT, fill=tk.X)
         for r in self.p1_radio:
             r.pack(side=tk.LEFT, fill=tk.X, expand=1)
+        self.pass_button1.pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def show_p2_choice(self):
         self.p2_radio = [
@@ -278,33 +292,43 @@ class App(tk.Tk):
             )
             for i, gate in enumerate(self.p2_hand)
         ]
+        self.lbl_p2.pack(side=tk.LEFT, fill=tk.X)
         for r in self.p2_radio:
             r.pack(side=tk.LEFT, fill=tk.X, expand=1)
+        self.pass_button2.pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def hide_p1_choice(self):
+        self.lbl_p1.pack_forget()
         for r in self.p1_radio:
             r.destroy()
+        self.pass_button1.pack_forget()
 
     def hide_p2_choice(self):
+        self.lbl_p2.pack_forget()
         for r in self.p2_radio:
             r.destroy()
+        self.pass_button2.pack_forget()
 
     def initial_circuit(self):
         self.qc = qiskit.QuantumCircuit(NUM_WIRES, NUM_WIRES)
+        self.qc.x(range(NUM_WIRES // 2))
+        self.qc.h(range(NUM_WIRES))
 
     def board(self):
         self.hide_p1_choice()
         self.hide_p2_choice()
+        self.hide_wire_choices()
+        self.apply_button.pack_forget()
         if self.active_player == 1:
             self.show_p1_choice()
             if len(self.p1_hand) == 0:
                 self.end_round()
         else:
             self.show_p2_choice()
-        self.replot()
+            if len(self.p2_hand) == 0:
+                self.end_round()
 
     def end_turn(self):
-
         if self.p1_pass and self.p2_pass:
             self.end_round()
             # self.board()
@@ -332,18 +356,28 @@ class App(tk.Tk):
     #     self.end_turn()
 
     def apply_gate(self, gate, wires):
-        print(gate, wires)
+        # print(gate, wires)
         if gate == "H":
             self.qc.h(wires[0])
         elif gate == "X":
             self.qc.x(wires[0])
+        elif gate == "Y":
+            self.qc.y(wires[0])
+        elif gate == "Z":
+            self.qc.z(wires[0])
+        elif gate == "S":
+            self.qc.s(wires[0])
+        elif gate == "T":
+            self.qc.t(wires[0])
         elif gate == "CX":
             self.qc.cnot(wires[1], wires[0])
+        elif gate == "CCX":
+            self.qc.toffoli(wires[2], wires[1], wires[0])
 
         self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(
             gate
         )
-
+        self.replot()
         self.end_turn()
 
     def win(self, wynik):
@@ -356,26 +390,53 @@ class App(tk.Tk):
         self.qc.measure(self.qc.qregs[0], self.qc.cregs[0])
         backend = Aer.get_backend("aer_simulator")
         counts = backend.run(self.qc, shots=1).result().get_counts()
-
+        result = list(counts.keys())[0]
         measure = 0
-        for i in list(counts.keys())[0]:
+        for i in result:
             measure += int(i)
 
         if measure < 3:
             self.p1_points += 1
+            pointsfor = "Player 1. (There are more 0s than 1s)"
         elif measure > 3:
             self.p2_points += 1
+            pointsfor = "Player 2. (There are more 1s than 0s)"
         else:
             self.p1_points += 1
             self.p2_points += 1
+            pointsfor = "both players. (There are as many 0s as 1s)"
+
+        tk.messagebox.showinfo(
+            "Measurement!",
+            "After 1 shot, the measurement result is: "
+            + result
+            + "\nPoints for: "
+            + pointsfor,
+        )
+
+        self.lbl_score.config(
+            text=f"Score\n Player1: {self.p1_points}\n Player2: {self.p2_points}\n Round no {self.round_no}"
+        )
+
         if self.p1_points == 2:
             if self.p2_points == 2:
                 self.win("draw")
+                tk.messagebox.showinfo("Game over", "Draw!")
+                self.quit()
             else:
-                self.win("player1 won")
+                self.win("Player1 won")
+                tk.messagebox.showinfo("Game over", "Player 1 won, congratulations!")
+                self.quit()
+
         elif self.p2_points == 2:
-            self.win("player2 won")
+            self.win("{layer2 won")
+            tk.messagebox.showinfo("Game over", "Player 2 won, congratulations!")
+            self.quit()
         else:  # nobody won yet
+            self.round_no += 1
+            self.lbl_score.config(
+                text=f"Score\n Player1: {self.p1_points}\n Player2: {self.p2_points}\n Round no {self.round_no}"
+            )
             self.p1_pass = False
             self.p2_pass = False
             self.initial_circuit()
