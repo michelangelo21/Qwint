@@ -187,10 +187,17 @@ class App(tk.Tk):
         for wire in self.radio_control2:
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
 
-    def show_radio_control1(self):
+    def show_radio_control1(self, disable=[]):
+        if self.target_wire.get() in disable:
+            self.apply_button.pack_forget()
+
         self.control1_lbl.pack(side=tk.TOP, fill=tk.X)
-        for wire in self.radio_control1:
+        for i, wire in enumerate(self.radio_control1):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
+            wire.configure(state=tk.NORMAL)
+            if i in disable:
+                wire.configure(state=tk.DISABLED)
+
 
     def show_radio_target(self, disable=[]):
         if self.target_wire.get() in disable:
@@ -274,21 +281,24 @@ class App(tk.Tk):
 
     def end_turn(self):
         
-        if self.p1_pass == 1 or self.p2_pass == 1:
-            self.board()
-        elif self.p1_pass == 1 and self.p2_pass == 1:
+        
+        if self.p1_pass == 1 and self.p2_pass == 1:
             self.end_round()
             self.board()
+        elif self.p1_pass == 1 or self.p2_pass == 1:
+            self.board()
         else:
-            self.active_player = (self.active_player+1)%2
+            
             self.board()
 
     def pass1(self):
         self.p1_pass = 1
+        self.active_player = (self.active_player+1)%2
         self.end_turn()
 
     def pass2(self):
         self.p2_pass = 1
+        self.active_player = (self.active_player+1)%2
         self.end_turn()
 
     def apply_gate(self, gate, wires):
@@ -299,6 +309,10 @@ class App(tk.Tk):
             self.qc.x(wires[0])
         elif gate == 'CX': 
             self.qc.cnot(wires[0], wires[1])
+
+        self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(gate)
+        
+        self.active_player = (self.active_player+1)%2
         
         self.end_turn()
         
@@ -310,7 +324,7 @@ class App(tk.Tk):
         self.draw(5, self.p1_deck, self.p1_hand)
         self.draw(5, self.p2_deck, self.p2_hand)
         cr = qiskit.ClassicalRegister(6)
-        self.qc.measure(range(6), cr)
+        self.qc.measure(range(6))
         measure = 0
         for i in self.cr:
             measure =+ i
