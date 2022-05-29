@@ -189,7 +189,7 @@ class App(tk.Tk):
             self.show_radio_target()
         elif gate in ['CX']:
             self.show_radio_control1()
-        elif gate in ['CCX',]:
+        elif gate in ['CCX']:
             self.show_radio_control2()
         else:
             logging.ERROR("Gate not found")
