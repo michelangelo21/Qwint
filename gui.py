@@ -54,14 +54,14 @@ class App(tk.Tk):
         self.control2_lbl = tk.Label(self.control2_frame, text='Control\nqubit')
         self.control2_wire = tk.IntVar()
         self.radio_control2 = [
-            tk.Radiobutton(self.control2_frame, text="q"+str(i), variable=self.control2_wire, value=i, command=self.show_apply)
+            tk.Radiobutton(self.control2_frame, text="q"+str(i), variable=self.control2_wire, value=i, command=self.show_radio_control1)
             for i in range(num_wires)
         ]
 
         self.control1_lbl = tk.Label(self.control1_frame, text='Control\nqubit')
         self.control1_wire = tk.IntVar()
         self.radio_control1 = [
-            tk.Radiobutton(self.control1_frame, text="q"+str(i), variable=self.control1_wire, value=i, command=self.show_apply)
+            tk.Radiobutton(self.control1_frame, text="q"+str(i), variable=self.control1_wire, value=i, command=self.show_radio_target)
             for i in range(num_wires)
         ]
         
@@ -107,7 +107,14 @@ class App(tk.Tk):
         p2_hand = random.choices(all_gates, k=10)
         p2_hand.sort()
 
-        self.apply_button = tk.Button(self.rightframe, text="Apply", command=self.show_apply)
+        self.apply_button = tk.Button(
+            self.rightframe,
+            text="Apply",
+            command=lambda: self.apply_gate(
+                self.p1_hand[self.p1_choice.get()] if self.active_player == 1 else self.p2_hand[self.p2_choice.get()],
+                [self.target_wire.get(), self.control1_wire.get(), self.control2_wire.get()]
+            )
+        )
 
         self.p1_choice = tk.IntVar()
         self.p2_choice = tk.IntVar()
@@ -118,7 +125,6 @@ class App(tk.Tk):
 
 
         tk.Button(self.rightframe, text='Quit', command=self.quit).pack()
-        tk.Button(self.rightframe, text='replot', command=self.replot).pack()
 
     # end __init__
 
@@ -181,20 +187,22 @@ class App(tk.Tk):
 
     def show_p2_choice(self):
         for i in range(len(self.p2_hand)):
-            tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def initial_circuit(self):
 
         self.qc = qiskit.QuantumCircuit(6, 6)
 
     def apply_gate(self, gate, wires):
-
+        print(gate, wires)
         if gate == 'H': 
             self.qc.h(wires[0])
-        if gate == 'X': 
+        elif gate == 'X': 
             self.qc.x(wires[0])
-        if gate == 'CX': 
+        elif gate == 'CX': 
             self.qc.cnot(wires[0],wires[1])
+
+        self.replot()
             
 
 if __name__ == '__main__':
