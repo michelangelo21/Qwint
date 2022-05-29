@@ -93,16 +93,22 @@ class App(tk.Tk):
         p2_hand = random.choices(all_gates, k=10)
         p2_hand.sort()
 
-        p1_choice = tk.IntVar()
-        p2_choice = tk.IntVar()
+        self.p1_choice = tk.IntVar()
+        self.p2_choice = tk.IntVar()
 
         for i in range(len(p1_hand)):
-            tk.Radiobutton(topframe, text=p1_hand[i], variable=p1_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            tk.Radiobutton(topframe, text=p1_hand[i], variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(p1_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
         for i in range(len(p2_hand)):
-            tk.Radiobutton(bottomframe, text=p2_hand[i], variable=p2_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            tk.Radiobutton(bottomframe, text=p2_hand[i], variable=self.p2_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
         tk.Button(rightframe, text='Quit', command=self.quit).pack()
+
+    def show_wire_choices(self, gate):
+        pass
+
+    def show_p1_choice(self):
+        pass
 
 if __name__ == '__main__':
     app = App()
