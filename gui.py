@@ -77,7 +77,7 @@ class App(tk.Tk):
         self.rightframe.grid(row=1, column=4, sticky='nsew')
 
         all_gates = [
-            'H', 'X'
+            'H', 'X', 'CX'
         ]
 
         self.qc = qiskit.QuantumCircuit(num_wires)
@@ -184,11 +184,18 @@ class App(tk.Tk):
             tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def initial_circuit(self):
-        pass
-        self.qc
+
+        self.qc = qiskit.QuantumCircuit(6, 6)
 
     def apply_gate(self, gate, wires):
-        pass
+
+        if gate == 'H': 
+            self.qc.h(wires[0])
+        if gate == 'X': 
+            self.qc.x(wires[0])
+        if gate == 'CX': 
+            self.qc.cnot(wires[0],wires[1])
+            
 
 if __name__ == '__main__':
     app = App()
