@@ -121,6 +121,9 @@ class App(tk.Tk):
         self.p1_choice = tk.IntVar()
         self.p2_choice = tk.IntVar()
 
+        self.p1_radio = []
+        self.p2_radio = []
+
 
         self.show_p1_choice()
         # self.show_p2_choice()
@@ -214,20 +217,30 @@ class App(tk.Tk):
 
 
     def show_p1_choice(self):
-        for i in range(len(self.p1_hand)):
-            tk.Radiobutton(self.topframe, text=self.p1_hand[i], variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[self.p1_choice.get()])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+        self.p1_radio = [
+            tk.Radiobutton(self.topframe, text=gate, variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[self.p1_choice.get()]))
+            # tk.Radiobutton(self.topframe, text=gate, variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[self.p1_choice.get()])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            for i, gate in enumerate(self.p1_hand)
+        ]
+        for r in self.p1_radio:
+            r.pack(side=tk.LEFT, fill=tk.X, expand=1)
+
 
     def show_p2_choice(self):
-        for i in range(len(self.p2_hand)):
-            tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i, command= lambda: self.show_wire_choices(self.p2_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+        self.p2_radio = [
+            tk.Radiobutton(self.bottomframe, text=gate, variable=self.p2_choice, value=i, command= lambda: self.show_wire_choices(self.p2_hand[self.p2_choice.get()]))
+            for i, gate in enumerate(self.p2_hand)
+        ]
+        for r in self.p2_radio:
+            r.pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def hide_p1_choice(self):
-        for i in range(len(self.p1_hand)):
-            self.topframe.destroy()
+        for r in self.p1_radio:
+            r.destroy()
     
     def hide_p2_choice(self):
-        for i in range(len(self.p2_hand)):
-            self.bottomframe.destroy()
+        for r in self.p2_radio:
+            r.destroy()
 
     def initial_circuit(self):
 
@@ -246,12 +259,15 @@ class App(tk.Tk):
             self.qc.cnot(wires[0], wires[1])
         self.active_player = (self.active_player+1)%2
         
-        if self.active_player == 0:
-            self.show_radio_control1()
+        self.hide_p1_choice()
+        self.hide_p2_choice()
+        if self.active_player == 1:
+
+            self.show_p1_choice()
             if len(self.p1_hand) == 0:
                 self.end_round()
         else:
-            self.show_radio_control2()
+            self.show_p2_choice()
         self.replot()
 
     def win(self, wynik):
