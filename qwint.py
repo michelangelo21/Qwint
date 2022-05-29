@@ -24,14 +24,16 @@ gates = [
 
 deck_1 = []
 
-def deck_build(deck, n, card):
-    for j in range(n):
-        deck.append(card)
+deck_1 = [*(["H"]*n_h), *(["X"]*n_x),*(["CX"]*n_cx)]
+
+#def deck_build(deck, n, card):
+#    for j in range(n):
+#        deck.append(card)
 
 
-deck_build(deck_1, n_h,  'H' )
-deck_build(deck_1, n_x,  'X' )
-deck_build(deck_1, n_cx, 'CX')
+#deck_build(deck_1, n_h,  'H' )
+#deck_build(deck_1, n_x,  'X' )
+#deck_build(deck_1, n_cx, 'CX')
 
 deck_2 = deck_1
 
@@ -46,6 +48,7 @@ def draw(n_cards, deck, hand):
 
 draw(n_cards1, deck_1, hand_1)
 draw(n_cards2, deck_2, hand_2)
+
 
 
 

@@ -1,4 +1,7 @@
 import tkinter as tk
+import logging
+logging.basicConfig(level=logging.INFO)
+import random
 from turtle import left
 import matplotlib
 import qiskit
@@ -49,7 +52,9 @@ class App(tk.Tk):
         rightframe = tk.Frame(midframe)
         rightframe.pack(side='right', fill='both', expand=True)
 
-
+        all_gates = [
+            'H', 'X'
+        ]
 
 
 
@@ -79,15 +84,23 @@ class App(tk.Tk):
         fig_bloch_canvas = FigureCanvasTkAgg(fig_bloch, leftframe)
         fig_bloch_canvas.get_tk_widget().pack(side=tk.LEFT, expand=0)
 
-
+        wire_choice = tk.IntVar()
         for i in range(num_wires):
-            tk.Radiobutton(leftframe, text="q"+str(i), variable=None, value=i).pack(side=tk.TOP, fill=tk.X, expand=1)
+            tk.Radiobutton(leftframe, text="q"+str(i), variable=wire_choice, value=i).pack(side=tk.TOP, fill=tk.X, expand=1)
 
-        for i in range(7):
-            tk.Button(topframe, text="X").pack(side=tk.LEFT, fill=tk.X, expand=1)
+        p1_hand = random.choices(all_gates, k=10)
+        p1_hand.sort()
+        p2_hand = random.choices(all_gates, k=10)
+        p2_hand.sort()
 
-        for i in range(10):
-            tk.Button(bottomframe, text="H").pack(side=tk.LEFT, fill=tk.X, expand=1)
+        p1_choice = tk.IntVar()
+        p2_choice = tk.IntVar()
+
+        for i in range(len(p1_hand)):
+            tk.Radiobutton(topframe, text=p1_hand[i], variable=p1_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
+
+        for i in range(len(p2_hand)):
+            tk.Radiobutton(bottomframe, text=p2_hand[i], variable=p2_choice, value=i).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
         tk.Button(rightframe, text='Quit', command=self.quit).pack()
 
