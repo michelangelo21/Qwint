@@ -175,10 +175,17 @@ class App(tk.Tk):
         for wire in self.radio_control2:
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
 
-    def show_radio_control1(self):
+    def show_radio_control1(self, disable=[]):
+        if self.target_wire.get() in disable:
+            self.apply_button.pack_forget()
+
         self.control1_lbl.pack(side=tk.TOP, fill=tk.X)
-        for wire in self.radio_control1:
+        for i, wire in enumerate(self.radio_control1):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
+            wire.configure(state=tk.NORMAL)
+            if i in disable:
+                wire.configure(state=tk.DISABLED)
+
 
     def show_radio_target(self, disable=[]):
         if self.target_wire.get() in disable:
