@@ -137,10 +137,16 @@ class App(tk.Tk):
 
     def initial_circuit(self):
         pass
-        self.qc
+        self.qc = qiskit.QuantumCircuit(6, 6)
 
     def apply_gate(self, gate, wires):
         pass
+        switch={
+            'H': self.qc.h(wires[0]),
+            'X': self.qc.x(wires[0]),
+            'CX': self.qc.cx(wires[0],wires[1]),
+            }
+        return
 
 if __name__ == '__main__':
     app = App()
