@@ -56,6 +56,21 @@ class App(tk.Tk):
             'H', 'X'
         ]
 
+        self.qc = qiskit.QuantumCircuit(num_wires)
+        self.round_no = 1
+        self.active_player = 1
+
+        self.p1_deck = []
+        self.p2_deck = []
+
+        self.p1_hand = []
+        self.p2_hand = []
+
+        self.p1_pass = False
+        self.p2_pass = False
+
+        
+
 
 
         qc = qiskit.QuantumCircuit(num_wires,num_wires)
@@ -85,8 +100,10 @@ class App(tk.Tk):
         fig_bloch_canvas.get_tk_widget().pack(side=tk.LEFT, expand=0)
 
         wire_choice = tk.IntVar()
-        for i in range(num_wires):
-            tk.Radiobutton(leftframe, text="q"+str(i), variable=wire_choice, value=i).pack(side=tk.TOP, fill=tk.X, expand=1)
+        self.radio_wire = [
+            tk.Radiobutton(leftframe, text="q"+str(i), variable=wire_choice, value=i)#.pack(side=tk.TOP, fill=tk.X, expand=1)
+            for i in range(num_wires)
+        ]
 
         p1_hand = random.choices(all_gates, k=10)
         p1_hand.sort()
@@ -104,10 +121,25 @@ class App(tk.Tk):
 
         tk.Button(rightframe, text='Quit', command=self.quit).pack()
 
+    def draw(self, n_cards, deck, hand):
+        for i in range (n_cards):
+            n_gate = random.randint(0, len(deck)-1)
+            hand.append(deck[n_gate])
+            del deck[n_gate]
+
+
     def show_wire_choices(self, gate):
-        pass
+        for wire in self.radio_wire:
+            wire.pack(side=tk.TOP, fill=tk.X, expand=1)
 
     def show_p1_choice(self):
+        pass
+
+    def initial_circuit(self):
+        pass
+        self.qc
+
+    def apply_gate(self, gate, wires):
         pass
 
 if __name__ == '__main__':
