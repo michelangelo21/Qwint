@@ -118,6 +118,18 @@ class App(tk.Tk):
             )
         )
 
+        self.pass_button1 = tk.Button(
+            self.rightframe,
+            text="Pass",
+            command=lambda: self.pass1()            
+        )
+        
+        self.pass_button2 = tk.Button(
+            self.rightframe,
+            text="Pass",
+            command=lambda: self.pass2()            
+        )
+
         self.p1_choice = tk.IntVar()
         self.p2_choice = tk.IntVar()
 
@@ -249,6 +261,36 @@ class App(tk.Tk):
         # self.qc = qiskit.QuantumCircuit(self.qr, self.cr)
         self.qc = qiskit.QuantumCircuit(6)
 
+    def board(self):
+        self.hide_p1_choice()
+        self.hide_p2_choice()
+        if self.active_player == 1:
+            self.show_p1_choice()
+            if len(self.p1_hand) == 0:
+                self.end_round()
+        else:
+            self.show_p2_choice()
+        self.replot()
+
+    def end_turn(self):
+        
+        if self.p1_pass == 1 or self.p2_pass == 1:
+            self.board()
+        elif self.p1_pass == 1 and self.p2_pass == 1:
+            self.end_round()
+            self.board()
+        else:
+            self.active_player = (self.active_player+1)%2
+            self.board()
+
+    def pass1(self):
+        self.p1_pass = 1
+        self.end_turn()
+
+    def pass2(self):
+        self.p2_pass = 1
+        self.end_turn()
+
     def apply_gate(self, gate, wires):
         print(gate, wires)
         if gate == 'H': 
@@ -257,18 +299,9 @@ class App(tk.Tk):
             self.qc.x(wires[0])
         elif gate == 'CX': 
             self.qc.cnot(wires[0], wires[1])
-        self.active_player = (self.active_player+1)%2
         
-        self.hide_p1_choice()
-        self.hide_p2_choice()
-        if self.active_player == 1:
-
-            self.show_p1_choice()
-            if len(self.p1_hand) == 0:
-                self.end_round()
-        else:
-            self.show_p2_choice()
-        self.replot()
+        self.end_turn()
+        
 
     def win(self, wynik):
         print(wynik)
