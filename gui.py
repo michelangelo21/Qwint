@@ -6,6 +6,7 @@ import random
 from turtle import left
 import matplotlib
 import qiskit
+from qiskit import Aer
 
 from qiskit.quantum_info import Statevector
 
@@ -18,14 +19,14 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
+NUM_WIRES = 6
+
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
 
         self.title("Qwint")
-
-        num_wires = 6
 
         # for player 1
         self.topframe = tk.Frame(self)
@@ -58,7 +59,7 @@ class App(tk.Tk):
                 value=i,
                 command=self.show_radio_control1,
             )
-            for i in range(num_wires)
+            for i in range(NUM_WIRES)
         ]
 
         self.control1_lbl = tk.Label(self.control1_frame, text="Control\nqubit")
@@ -73,7 +74,7 @@ class App(tk.Tk):
                     disable=[self.control1_wire.get()]
                 ),
             )
-            for i in range(num_wires)
+            for i in range(NUM_WIRES)
         ]
 
         self.target_lbl = tk.Label(self.target_frame, text="Target\nqubit")
@@ -86,7 +87,7 @@ class App(tk.Tk):
                 value=i,
                 command=self.show_apply,
             )
-            for i in range(num_wires)
+            for i in range(NUM_WIRES)
         ]
 
         self.rightframe = tk.Frame(self)
@@ -94,7 +95,7 @@ class App(tk.Tk):
 
         all_gates = ["H", "X", "CX"]
 
-        self.qc = qiskit.QuantumCircuit(num_wires)
+        self.qc = qiskit.QuantumCircuit(NUM_WIRES, NUM_WIRES)
         self.initial_circuit()
         self.replot()
 
@@ -107,9 +108,9 @@ class App(tk.Tk):
         self.p2_deck = self.p1_deck.copy()
 
         self.p1_hand = []
-        self.draw(10, self.p1_deck, self.p1_hand)
+        self.draw(2, self.p1_deck, self.p1_hand)
         self.p2_hand = []
-        self.draw(10, self.p2_deck, self.p2_hand)
+        self.draw(2, self.p2_deck, self.p2_hand)
 
         self.p1_pass = False
         self.p2_pass = False
@@ -134,17 +135,15 @@ class App(tk.Tk):
             ),
         )
 
+        self.lbl_p1 = tk.Label(self.topframe, text="Player 1's hand: ")
         self.pass_button1 = tk.Button(
-            self.rightframe,
-            text="Pass",
-            command=lambda: self.pass1()            
-        )
-        
+            self.rightframe, text="Pass", command=lambda: self.pass_round()
+        ).pack()
+
+        self.lbl_p1 = tk.Label(self.topframe, text="Player 1's hand: ")
         self.pass_button2 = tk.Button(
-            self.rightframe,
-            text="Pass",
-            command=lambda: self.pass2()            
-        )
+            self.rightframe, text="Pass", command=lambda: self.pass_round()
+        ).pack()
 
         self.p1_choice = tk.IntVar()
         self.p2_choice = tk.IntVar()
@@ -161,6 +160,8 @@ class App(tk.Tk):
 
     def replot(self):
         try:
+            self.fig_qc_canvas.figure.clear()
+            self.fig_bloch_canvas.figure.clear()
             self.fig_qc_canvas.get_tk_widget().destroy()
             self.fig_bloch_canvas.get_tk_widget().destroy()
         except:
@@ -289,11 +290,7 @@ class App(tk.Tk):
             r.destroy()
 
     def initial_circuit(self):
-
-        # self.qr = qiskit.QuantumRegister(6)
-        # self.cr = qiskit.ClassicalRegister(6)
-        # self.qc = qiskit.QuantumCircuit(self.qr, self.cr)
-        self.qc = qiskit.QuantumCircuit(6)
+        self.qc = qiskit.QuantumCircuit(NUM_WIRES, NUM_WIRES)
 
     def board(self):
         self.hide_p1_choice()
@@ -307,26 +304,32 @@ class App(tk.Tk):
         self.replot()
 
     def end_turn(self):
-        
-        
-        if self.p1_pass == 1 and self.p2_pass == 1:
+
+        if self.p1_pass and self.p2_pass:
             self.end_round()
+            # self.board()
+        elif self.p1_pass or self.p2_pass:
             self.board()
-        elif self.p1_pass == 1 or self.p2_pass == 1:
+        else:  # change players if nobody passed
+            self.active_player = (self.active_player + 1) % 2
             self.board()
+
+    def pass_round(self):
+        if self.active_player == 1:
+            self.p1_pass = True
         else:
-            
-            self.board()
-
-    def pass1(self):
-        self.p1_pass = 1
-        self.active_player = (self.active_player+1)%2
+            self.p2_pass = True
+        self.active_player = (self.active_player + 1) % 2
         self.end_turn()
 
-    def pass2(self):
-        self.p2_pass = 1
-        self.active_player = (self.active_player+1)%2
-        self.end_turn()
+    # def pass1(self):
+    #     self.p1_pass = True
+    #     self.end_turn()
+
+    # def pass2(self):
+    #     self.p2_pass = True
+    #     self.active_player = (self.active_player + 1) % 2
+    #     self.end_turn()
 
     def apply_gate(self, gate, wires):
         print(gate, wires)
@@ -335,33 +338,36 @@ class App(tk.Tk):
         elif gate == "X":
             self.qc.x(wires[0])
         elif gate == "CX":
-            self.qc.cnot(wires[0], wires[1])
+            self.qc.cnot(wires[1], wires[0])
 
-        self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(gate)
-        
-        self.active_player = (self.active_player+1)%2
-        
+        self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(
+            gate
+        )
+
         self.end_turn()
-        
 
     def win(self, wynik):
         print(wynik)
 
     def end_round(self):
-        self.draw(5, self.p1_deck, self.p1_hand)
-        self.draw(5, self.p2_deck, self.p2_hand)
-        cr = qiskit.ClassicalRegister(6)
-        self.qc.measure(range(6))
+        self.draw(3, self.p1_deck, self.p1_hand)
+        self.draw(3, self.p2_deck, self.p2_hand)
+
+        self.qc.measure(self.qc.qregs[0], self.qc.cregs[0])
+        backend = Aer.get_backend("aer_simulator")
+        counts = backend.run(self.qc, shots=1).result().get_counts()
+
         measure = 0
-        for i in self.cr:
-            measure = +i
+        for i in list(counts.keys())[0]:
+            measure += int(i)
+
         if measure < 3:
-            self.p1_points = +1
+            self.p1_points += 1
         elif measure > 3:
-            self.p2_points = +1
+            self.p2_points += 1
         else:
-            self.p1_points = +1
-            self.p2_points = +1
+            self.p1_points += 1
+            self.p2_points += 1
         if self.p1_points == 2:
             if self.p2_points == 2:
                 self.win("draw")
@@ -369,6 +375,11 @@ class App(tk.Tk):
                 self.win("player1 won")
         elif self.p2_points == 2:
             self.win("player2 won")
+        else:  # nobody won yet
+            self.p1_pass = False
+            self.p2_pass = False
+            self.initial_circuit()
+            self.board()
 
 
 if __name__ == "__main__":
