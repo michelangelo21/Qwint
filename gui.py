@@ -179,15 +179,44 @@ class App(tk.Tk):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
 
     def show_wire_choices(self, gate):
-        self.show_radio_target()
+        self.hide_wire_choices()
+
+        if gate in ['H', 'X']:
+            self.show_radio_target()
+        elif gate in ['CX']:
+            self.show_radio_control1()
+        elif gate in ['CCX']:
+            self.show_radio_control2()
+        else:
+            logging.ERROR("Gate not found")
+
+    def hide_wire_choices(self):
+        self.control1_lbl.pack_forget()
+        self.control2_lbl.pack_forget()
+        self.target_lbl.pack_forget()
+        for wire in self.radio_control1:
+            wire.pack_forget()
+        for wire in self.radio_control2:
+            wire.pack_forget()
+        for wire in self.radio_target:
+            wire.pack_forget()
+
 
     def show_p1_choice(self):
         for i in range(len(self.p1_hand)):
-            tk.Radiobutton(self.topframe, text=self.p1_hand[i], variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            tk.Radiobutton(self.topframe, text=self.p1_hand[i], variable=self.p1_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[self.p1_choice.get()])).pack(side=tk.LEFT, fill=tk.X, expand=1)
 
     def show_p2_choice(self):
         for i in range(len(self.p2_hand)):
-            tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i, command= lambda: self.show_wire_choices(self.p1_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+            tk.Radiobutton(self.bottomframe, text=self.p2_hand[i], variable=self.p2_choice, value=i, command= lambda: self.show_wire_choices(self.p2_hand[i])).pack(side=tk.LEFT, fill=tk.X, expand=1)
+
+    def hide_p1_choice(self):
+        for i in range(len(self.p1_hand)):
+            self.topframe.destroy()
+    
+    def hide_p2_choice(self):
+        for i in range(len(self.p2_hand)):
+            self.bottomframe.destroy()
 
     def initial_circuit(self):
 
