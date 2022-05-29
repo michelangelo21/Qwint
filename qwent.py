@@ -347,15 +347,6 @@ class App(tk.Tk):
         self.active_player = (self.active_player + 1) % 2
         self.end_turn()
 
-    # def pass1(self):
-    #     self.p1_pass = True
-    #     self.end_turn()
-
-    # def pass2(self):
-    #     self.p2_pass = True
-    #     self.active_player = (self.active_player + 1) % 2
-    #     self.end_turn()
-
     def apply_gate(self, gate, wires):
         # print(gate, wires)
         if gate == "H":
@@ -409,7 +400,7 @@ class App(tk.Tk):
 
         tk.messagebox.showinfo(
             "Measurement!",
-            "After 1 shot, the measurement result is: "
+            "After one shot, the measurement result is: "
             + result
             + "\nPoints for: "
             + pointsfor,
