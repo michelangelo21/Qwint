@@ -313,6 +313,7 @@ class App(tk.Tk):
         self.qc = qiskit.QuantumCircuit(NUM_WIRES, NUM_WIRES)
         self.qc.x(range(NUM_WIRES // 2))
         self.qc.h(range(NUM_WIRES))
+        self.qc.barrier()
 
     def board(self):
         self.hide_p1_choice()
