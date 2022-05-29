@@ -61,7 +61,7 @@ class App(tk.Tk):
         self.control1_lbl = tk.Label(self.control1_frame, text='Control\nqubit')
         self.control1_wire = tk.IntVar()
         self.radio_control1 = [
-            tk.Radiobutton(self.control1_frame, text="q"+str(i), variable=self.control1_wire, value=i, command= lambda: self.show_radio_target(skip=[self.control1_wire.get()]))
+            tk.Radiobutton(self.control1_frame, text="q"+str(i), variable=self.control1_wire, value=i, command= lambda: self.show_radio_target(disable=[self.control1_wire.get()]))
             for i in range(num_wires)
         ]
         
@@ -177,15 +177,15 @@ class App(tk.Tk):
         for wire in self.radio_control1:
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
 
-    def show_radio_target(self, skip=[]):
-        if self.target_wire.get() in skip:
+    def show_radio_target(self, disable=[]):
+        if self.target_wire.get() in disable:
             self.apply_button.pack_forget()
 
         self.target_lbl.pack(side=tk.TOP, fill=tk.X)
         for i, wire in enumerate(self.radio_target):
             wire.pack(side=tk.TOP, fill=tk.X, expand=1)
             wire.configure(state=tk.NORMAL)
-            if i in skip:
+            if i in disable:
                 wire.configure(state=tk.DISABLED)
 
     def show_wire_choices(self, gate):
