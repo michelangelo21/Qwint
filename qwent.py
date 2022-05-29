@@ -432,6 +432,7 @@ class App(tk.Tk):
             self.p1_pass = False
             self.p2_pass = False
             self.initial_circuit()
+            self.replot()
             self.board()
 
 
