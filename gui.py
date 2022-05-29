@@ -292,9 +292,10 @@ class App(tk.Tk):
         elif gate == "CX":
             self.qc.cnot(wires[0], wires[1])
 
-        self.p1_hand.remove(gate) if self.active_player == 1 else self.p2_hand.remove(
-            gate
-        )
+        if self.active_player == 1:
+            self.p1_hand.remove(gate)
+        else:
+            self.p2_hand.remove(gate)
 
         self.active_player = (self.active_player + 1) % 2
 
