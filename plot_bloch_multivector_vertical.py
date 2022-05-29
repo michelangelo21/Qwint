@@ -58,8 +58,8 @@ def plot_bloch_multivector_vertical(
     for i in range(num):
         pos = num - 1 - i if reverse_bits else i
         ax = fig.add_subplot(num, 1, i + 1, projection="3d")
-        plot_bloch_vector(bloch_data[i], "qubit " + str(pos), ax=ax, figsize=figsize)
-    fig.suptitle(title, fontsize=16, y=1.01)
+        plot_bloch_vector(bloch_data[i], ax=ax, figsize=figsize)
+    # fig.suptitle(title, fontsize=16, y=1.01)
     matplotlib_close_if_inline(fig)
     if filename is None:
         return fig
