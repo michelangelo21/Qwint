@@ -86,6 +86,8 @@ class App(tk.Tk):
 
         self.round_no = 1
         self.active_player = 1
+        self.p1_points = 0
+        self.p2_points = 0
 
         self.p1_deck = [*(["H"]*12), *(["X"]*12),*(["CX"]*6)]
         self.p2_deck = self.p1_deck.copy()
@@ -154,6 +156,8 @@ class App(tk.Tk):
         self.fig_bloch_canvas.get_tk_widget().pack(side=tk.LEFT, expand=0)
 
     def draw(self, n_cards, deck, hand):
+        if n_cards+len(hand)>10:
+            n_cards = 10 - len(hand)
         for i in range (n_cards):
             gate = random.choice(deck)
             hand.append(gate)
@@ -220,18 +224,48 @@ class App(tk.Tk):
 
     def initial_circuit(self):
 
-        self.qc = qiskit.QuantumCircuit(6, 6)
+        self.qr = qiskit.QuantumRegister(6)
+        self.cr = qiskit.ClassicalRegister(6)
+        self.qc = qiskit.QuantumCircuit(self.qr, self.cr)
 
     def apply_gate(self, gate, wires):
         print(gate, wires)
         if gate == 'H': 
-            self.qc.h(wires[0])
+            self.qc.h(self.qr[wires[0]])
         elif gate == 'X': 
-            self.qc.x(wires[0])
+            self.qc.x(self.qr[wires[0]])
         elif gate == 'CX': 
-            self.qc.cnot(wires[0],wires[1])
+            self.qc.cnot(self.qr[wires[0]],self.qr[wires[1]])
+        self.active_player = (self.active_player+1)%2
+        
+        if self.active_player == 0:
+            self.show_radio_control1(self)
+            if len(self.p1_hand) == 0:
+                self.end_round()
+        else:
+            self.show_radio_control2(self)
 
-        self.replot()
+    def end_round(self):
+        self.draw(5, self.p1_deck, self.p1_hand)
+        self.draw(5, self.p2_deck, self.p2_hand)
+        self.qc.measure(self.qr, self.cr)
+        measure = 0
+        for i in self.cr:
+            measure =+ i
+        if measure < 3:
+            self.p1_points =+ 1
+        elif measure > 3:
+            self.p2_points =+ 1
+        else:
+            self.p1_points =+ 1
+            self.p2_points =+ 1
+        if self.p1_points == 2:
+            if self.p2_points == 2:
+                self.win('draw')
+            else:
+                self.win('player1 won')
+        elif self.p2_points == 2:
+            self.win('player2 won')
             
 
 if __name__ == '__main__':
