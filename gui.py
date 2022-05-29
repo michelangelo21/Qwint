@@ -247,6 +247,9 @@ class App(tk.Tk):
             self.show_radio_control2()
         self.replot()
 
+    def win(self, wynik):
+        print(wynik)
+
     def end_round(self):
         self.draw(5, self.p1_deck, self.p1_hand)
         self.draw(5, self.p2_deck, self.p2_hand)
