@@ -189,7 +189,7 @@ class App(tk.Tk):
             self.show_radio_target()
         elif gate in ['CX']:
             self.show_radio_control1()
-        elif gate in ['CCX']:
+        elif gate in ['CCX',]:
             self.show_radio_control2()
         else:
             logging.ERROR("Gate not found")
@@ -224,31 +224,34 @@ class App(tk.Tk):
 
     def initial_circuit(self):
 
-        self.qr = qiskit.QuantumRegister(6)
-        self.cr = qiskit.ClassicalRegister(6)
-        self.qc = qiskit.QuantumCircuit(self.qr, self.cr)
+        # self.qr = qiskit.QuantumRegister(6)
+        # self.cr = qiskit.ClassicalRegister(6)
+        # self.qc = qiskit.QuantumCircuit(self.qr, self.cr)
+        self.qc = qiskit.QuantumCircuit(6)
 
     def apply_gate(self, gate, wires):
         print(gate, wires)
         if gate == 'H': 
-            self.qc.h(self.qr[wires[0]])
+            self.qc.h(wires[0])
         elif gate == 'X': 
-            self.qc.x(self.qr[wires[0]])
+            self.qc.x(wires[0])
         elif gate == 'CX': 
-            self.qc.cnot(self.qr[wires[0]],self.qr[wires[1]])
+            self.qc.cnot(wires[0], wires[1])
         self.active_player = (self.active_player+1)%2
         
         if self.active_player == 0:
-            self.show_radio_control1(self)
+            self.show_radio_control1()
             if len(self.p1_hand) == 0:
                 self.end_round()
         else:
-            self.show_radio_control2(self)
+            self.show_radio_control2()
+        self.replot()
 
     def end_round(self):
         self.draw(5, self.p1_deck, self.p1_hand)
         self.draw(5, self.p2_deck, self.p2_hand)
-        self.qc.measure(self.qr, self.cr)
+        cr = qiskit.ClassicalRegister(6)
+        self.qc.measure(range(6), cr)
         measure = 0
         for i in self.cr:
             measure =+ i
