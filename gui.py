@@ -53,7 +53,7 @@ class App(tk.Tk):
         rightframe.pack(side='right', fill='both', expand=True)
 
         all_gates = [
-            'H', 'X'
+            'H', 'X', 'CX'
         ]
 
         self.qc = qiskit.QuantumCircuit(num_wires)
@@ -75,11 +75,6 @@ class App(tk.Tk):
 
         qc = qiskit.QuantumCircuit(num_wires,num_wires)
         qc.h(range(num_wires))
-        qc.cnot(0,1)
-        qc.h(2)
-        qc.x(2)
-        for i in range(10):
-            qc.h(2)
 
         state = Statevector.from_instruction(qc)
         fig_bloch = plot_bloch_multivector_vertical(state)   
@@ -136,17 +131,18 @@ class App(tk.Tk):
         pass
 
     def initial_circuit(self):
-        pass
+
         self.qc = qiskit.QuantumCircuit(6, 6)
 
     def apply_gate(self, gate, wires):
-        pass
-        switch={
-            'H': self.qc.h(wires[0]),
-            'X': self.qc.x(wires[0]),
-            'CX': self.qc.cx(wires[0],wires[1]),
-            }
-        return
+
+        if gate == 'H': 
+            self.qc.h(wires[0])
+        if gate == 'X': 
+            self.qc.x(wires[0])
+        if gate == 'CX': 
+            self.qc.cnot(wires[0],wires[1])
+            
 
 if __name__ == '__main__':
     app = App()
